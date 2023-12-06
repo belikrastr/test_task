@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cash_register.apps.CashRegisterConfig',
 ]
 
 MIDDLEWARE = [
