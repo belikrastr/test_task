@@ -1,10 +1,13 @@
+import os
+from django.conf import settings
+from django.http import HttpResponse, FileResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.http import HttpResponse
 from django.template.loader import get_template
 import pdfkit
 import qrcode
-from io import BytesIO
+from django.db.models import Sum
+from django.utils import timezone
 
 from .models import Item
 
@@ -17,15 +20,24 @@ class CashMachineView(APIView):
         # Получение объектов товаров
         items = Item.objects.filter(id__in=item_ids)
 
+        # Вычисление общего количества товаров и общей стоимости
+        total_quantity = items.aggregate(Sum('quantity'))['quantity__sum']
+        total_price = items.aggregate(Sum('total_price'))['total_price__sum']
+
         # Генерация PDF-чека
         template = get_template('receipt_template.html')
-        html_content = template.render({'items': items})
-        pdf = pdfkit.from_string(html_content, False)
+        generated_at = timezone.now().strftime('%d.%m.%Y %H:%M')
+        html_content = template.render({'items': items, 'total_quantity': total_quantity, 'generated_at': generated_at})
+
+        # Создание папки media, если она не существует
+        media_folder = os.path.join(settings.BASE_DIR, 'media')
+        os.makedirs(media_folder, exist_ok=True)
+
+        # Путь для сохранения PDF-чека
+        pdf_path = os.path.join(media_folder, 'receipt_template.pdf')
 
         # Сохранение PDF-чека в папку media
-        pdf_path = 'media/invoice.pdf'
-        with open(pdf_path, 'wb') as f:
-            f.write(pdf)
+        pdfkit.from_string(html_content, pdf_path)
 
         # Генерация QR-кода
         qr = qrcode.QRCode(
@@ -40,9 +52,28 @@ class CashMachineView(APIView):
         # Создание QR-кода в виде изображения
         img = qr.make_image(fill_color="black", back_color="white")
 
+        # Путь для сохранения QR-кода
+        qr_path = os.path.join(media_folder, 'qrcode.png')
+
         # Сохранение QR-кода в папку media
-        qr_path = 'media/qrcode.png'
         img.save(qr_path)
 
         # Отправка QR-кода в ответе на запрос
         return Response({'qr_code': qr_path})
+
+
+class GetPDFView(APIView):
+    def get(self, request, file_name):
+        # Формирование пути к файлу
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+
+        # Проверка наличия файла
+        if os.path.exists(file_path):
+            # Отправка файла в ответе на запрос
+            with open(file_path, 'rb') as file:
+                response = HttpResponse(file.read(), content_type='application/pdf')
+                response['Content-Disposition'] = f'inline; filename="{file_name}"'
+                return response
+        else:
+            # Отправка ответа с кодом 404, если файл не найден
+            return HttpResponse("File not found", status=404)
