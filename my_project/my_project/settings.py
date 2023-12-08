@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -7,7 +8,10 @@ SECRET_KEY = 'django-insecure-!f@(#d+!ow+xkv5ru16%tk@%wwoie-+-*k6$el%$cts1q=a%i-
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['172.20.10.8',
+                 '127.0.0.1',
+                 '*',
+                 ]
 
 
 INSTALLED_APPS = [
@@ -18,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cash_register.apps.CashRegisterConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -35,7 +40,7 @@ ROOT_URLCONF = 'my_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'your_app', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,3 +92,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
