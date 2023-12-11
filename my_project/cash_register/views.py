@@ -1,6 +1,6 @@
 import os
 from django.conf import settings
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse
 from django.urls import reverse
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -28,7 +28,13 @@ class CashMachineView(APIView):
         # Генерация PDF-чека
         template = get_template('receipt_template.html')
         generated_at = timezone.now().strftime('%d.%m.%Y %H:%M')
-        html_content = template.render({'items': items, 'total_quantity': total_quantity, 'generated_at': generated_at})
+        html_content = template.render(
+            {'items': items,
+             'total_price': total_price,
+             'total_quantity': total_quantity,
+             'generated_at': generated_at
+             }
+        )
 
         # Создание папки media, если она не существует
         media_folder = os.path.join(settings.BASE_DIR, 'media')
@@ -42,7 +48,7 @@ class CashMachineView(APIView):
 
         # Получение URL-адреса представления GetPDFView через reverse
         pdf_url = reverse('get_pdf', args=['receipt_template.pdf'])
-        
+
         # Построение абсолютного URL
         pdf_uri = request.build_absolute_uri(pdf_url)
 
@@ -76,8 +82,12 @@ class GetPDFView(APIView):
         if os.path.exists(file_path):
             # Отправка файла в ответе на запрос
             with open(file_path, 'rb') as file:
-                response = HttpResponse(file.read(), content_type='application/pdf')
-                response['Content-Disposition'] = f'inline; filename="{file_name}"'
+                response = HttpResponse(
+                    file.read(), content_type='application/pdf'
+                )
+                response['Content-Disposition'] = (
+                    f'inline; filename="{file_name}"'
+                )
                 return response
         else:
             # Отправка ответа с кодом 404, если файл не найден
