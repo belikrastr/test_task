@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
 from django.http import HttpResponse, FileResponse
+from django.urls import reverse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.template.loader import get_template
@@ -39,6 +40,12 @@ class CashMachineView(APIView):
         # Сохранение PDF-чека в папку media
         pdfkit.from_string(html_content, pdf_path)
 
+        # Получение URL-адреса представления GetPDFView через reverse
+        pdf_url = reverse('get_pdf', args=['receipt_template.pdf'])
+        
+        # Построение абсолютного URL
+        pdf_uri = request.build_absolute_uri(pdf_url)
+
         # Генерация QR-кода
         qr = qrcode.QRCode(
             version=1,
@@ -46,16 +53,14 @@ class CashMachineView(APIView):
             box_size=10,
             border=4,
         )
-        qr.add_data(pdf_path)
+        qr.add_data(pdf_uri)
         qr.make(fit=True)
 
         # Создание QR-кода в виде изображения
         img = qr.make_image(fill_color="black", back_color="white")
 
-        # Путь для сохранения QR-кода
-        qr_path = os.path.join(media_folder, 'qrcode.png')
-
         # Сохранение QR-кода в папку media
+        qr_path = 'media/qrcode.png'
         img.save(qr_path)
 
         # Отправка QR-кода в ответе на запрос
