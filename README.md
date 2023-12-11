@@ -1,13 +1,13 @@
 # Cash Register. «Кассовый аппарат»
-### Описание
+## Описание
 «Кассовый аппарат» для вымышленного магазина. Формирует чек в формате PDF. Так же формирует ссылку на этот PDF-файл и кодирует его в QR-код, по которому можно получить чек.
 
-### Технологии
+## Технологии
 - Python 3 
 - Django 
 - Django REST Framework
 
-### Подготовка к запуску проекта
+## Подготовка к запуску проекта
 - Склонировать репозиторий на локальную машину
 ```bash
 git clone git@github.com:belikrastr/test_task.git
@@ -41,13 +41,13 @@ python manage.py migrate
 ```
 
 
-### Запуск проекта 
+## Запуск проекта 
 - При запуске приложения указывайте IP-адрес вашей машины в локальной сети. Например:
 ```bash
 python manage.py runserver 192.168.1.68:8000
 ```
 
-### Примеры запросов к API.
+## Примеры запросов к API.
 - Получение чека(.pdf)
 ###
 GET http://192.168.1.68:8000/get_pdf/receipt_template.pdf
@@ -63,7 +63,7 @@ Content-Type: application/json
 }
 ```
 
-### Автор проекта
+## Автор проекта
 Беликов Владимир - [Telegram](https://t.me/belikrastr) - belikrastr@yandex.ru
 
 Project Link: [https://github.com/belikrastr/test_task.git](https://github.com/belikrastr/test_task.git)
