@@ -34,7 +34,7 @@ pip install -r requirements.txt
 - Перейти в директорию my_project
 ```bash
 cd my_project/
-``
+```
 - Выполнить миграции
 ```bash
 python manage.py migrate
