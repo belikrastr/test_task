@@ -13,6 +13,9 @@
 git clone git@github.com:belikrastr/test_task.git
 ```
 - Перейти в директорию test_task
+```bash
+cd test_task/
+```
 - Cоздать и активировать виртуальное окружение
 ```bash
 python -m venv venv
@@ -29,6 +32,9 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 - Перейти в директорию my_project
+```bash
+cd my_project/
+``
 - Выполнить миграции
 ```bash
 python manage.py migrate
