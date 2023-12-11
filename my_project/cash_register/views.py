@@ -8,7 +8,7 @@ from django.template.loader import get_template
 import pdfkit
 import qrcode
 from django.db.models import Sum
-from django.utils import timezone
+import datetime
 
 from .models import Item
 
@@ -27,7 +27,7 @@ class CashMachineView(APIView):
 
         # Генерация PDF-чека
         template = get_template('receipt_template.html')
-        generated_at = timezone.now().strftime('%d.%m.%Y %H:%M')
+        generated_at = datetime.datetime.now().strftime('%d.%m.%Y %H:%M')
         html_content = template.render(
             {'items': items,
              'total_price': total_price,
