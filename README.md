@@ -8,10 +8,11 @@
 - Django REST Framework
 
 ### Подготовка к запуску проекта
-- Склонировать репозиторий на локальную мшину
+- Склонировать репозиторий на локальную машину
 ```bash
 git clone git@github.com:belikrastr/test_task.git
 ```
+- Перейти в директорию test_task
 - Cоздать и активировать виртуальное окружение
 ```bash
 python -m venv venv
@@ -27,10 +28,8 @@ python -m pip install --upgrade pip
 ```bash
 pip install -r requirements.txt
 ```
-- Создать и выполнить миграции
-```bash
-python manage.py makemigrations
-```
+- Перейти в директорию my_project
+- Выполнить миграции
 ```bash
 python manage.py migrate
 ```
