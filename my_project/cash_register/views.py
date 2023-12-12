@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from django.template.loader import get_template
 import pdfkit
 import qrcode
-from django.db.models import Sum
 import datetime
 
 from .models import Item
@@ -21,17 +20,24 @@ class CashMachineView(APIView):
         # Получение объектов товаров
         items = Item.objects.filter(id__in=item_ids)
 
-        # Вычисление общего количества товаров и общей стоимости
-        total_quantity = items.aggregate(Sum('quantity'))['quantity__sum']
-        total_price = items.aggregate(Sum('total_price'))['total_price__sum']
+        total_price = sum(item.price for item in items)
 
-        # Генерация PDF-чека
+        items_data = []
+        quantity = request.data.get('quantity', 1)
+
+        for item in items:
+            item_data = {
+                "title": item.title,
+                "price": item.price,
+                "quantity": quantity,
+                "total_item_price": item.price * quantity,
+            }
+            items_data.append(item_data)
         template = get_template('receipt_template.html')
         generated_at = datetime.datetime.now().strftime('%d.%m.%Y %H:%M')
         html_content = template.render(
-            {'items': items,
+            {'items': items_data,
              'total_price': total_price,
-             'total_quantity': total_quantity,
              'generated_at': generated_at
              }
         )
